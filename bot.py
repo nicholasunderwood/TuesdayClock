@@ -7,11 +7,6 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 timeTuple = ("day", "hour", "minute", "second")
 
-def job():
-    bot.guild
-
-s = schedule.every().tuesday.do(job)
-
 bot = commands.Bot(command_prefix="!")
 
 @bot.event
@@ -43,13 +38,11 @@ async def update(ctx):
     delta = midnight - now
 
     times = [days, delta.seconds//3600, (delta.seconds//60)%60, delta.seconds%60]
-    print(times)
-    print(days)
+
     for time, name in zip(times, timeTuple):
         msg += str(time) + " " + str(name) + (" " if days == 1 else "s ")
 
     msg += "until Tuesday."
-    print(msg)
 
     await ctx.send(msg)
 
