@@ -5,11 +5,12 @@ from discord.ext import commands
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+timeTuple = ("day", "hour", "minute", "second")
 
 def job():
     bot.guild
 
-s = schedule.every().wednesday.do(job)
+s = schedule.every().tuesday.do(job)
 
 bot = commands.Bot(command_prefix="!")
 
@@ -27,16 +28,29 @@ async def on_ready():
 
 @bot.command(name='update', help='Provides the current status of the tuesday clock')
 async def update(ctx):
-    now = datetime.datetime.now()
-    delta = datetime.timedelta(seconds=-now.second, minutes=-now.minute, hours=-now.hour, days=-now.weekday() + 1, weeks=1)
-    days, hours, minutes, seconds = delta.days, delta.seconds//3600, (delta.seconds//60)%60, delta.seconds%60
+    msg = "I am Idris Elba, "
 
-    await ctx.send(
-        "I am Idris Elba, and there are "
-        f'{days} day{"" if days == 1 else "s"}, ' +
-        f'{hours} hour{"" if hours == 1 else "s"}, ' +
-        f'{minutes} minute{"" if minutes == 1 else "s"}, and '+
-        f'{seconds} second{"" if seconds == 1 else "s"} until Tuesday.'
-    )
+    now = datetime.datetime.utcnow() - datetime.timedelta(hours=7)
+
+    if(now.weekday() == 2):
+        msg += "and it's Tuesday today! There are "
+    else:
+        msg += "and there are "
+
+    days = (7 - now.weekday()) % 7
+
+    midnight = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(days=1)
+    delta = midnight - now
+
+    times = [days, delta.seconds//3600, (delta.seconds//60)%60, delta.seconds%60]
+    print(times)
+    print(days)
+    for time, name in zip(times, timeTuple):
+        msg += str(time) + " " + str(name) + (" " if days == 1 else "s ")
+
+    msg += "until Tuesday."
+    print(msg)
+
+    await ctx.send(msg)
 
 bot.run(TOKEN)
